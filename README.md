@@ -68,5 +68,5 @@ This allows me to connect:
 - Log density of states \( \log g(E) \)  
 - Specific heat curves showing phase transition  
 - Koopman spectral gap vs temperature  
-- Relaxation time vs temperature
+
   
