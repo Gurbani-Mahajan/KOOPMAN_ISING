@@ -14,6 +14,17 @@ def energy_2d(s, J):
             E_ij -= J * s[i, j] * (s[(i + 1) % l, j] + s[i, (j + 1) % l] + s[(i - 1) % l, j] + s[i, (j - 1) % l])
     return E_ij / 2
 
+def random_lattice(num_sites):
+    s = np.ones([num_sites, num_sites])
+    # randomising spins so that net magnetic moment is roughly 0
+    for i in range(num_sites):
+        for j in range(num_sites):
+            if random.random() > 0.5:
+                s[i, j] = 1
+            else:
+                s[i, j] = -1
+    return s
+
 
 def glauber(E,s, T):
     s_2d = s.copy()
@@ -93,7 +104,7 @@ def edmd(X1,X2, Y1,Y2):
     return eigvals
 
 
-num_sites = 24  # number of lattice sites
+num_sites = 16  # number of lattice sites
 num_steps = int(10e7)  # number of steps of mc algo
 J = 1  # ferromagnetic
 kb = 1  # boltzman constant in units
@@ -161,7 +172,7 @@ for i in range(num_steps):
     ln_g[index_E[E_initial - E_min]] += ln_f  # g->g*f so lng->lng+lnf
 
     # updating modification factor if histogram flattens after 1000 steps
-    if (i + 1) % (10000) == 0:
+    if (i + 1) % (1000) == 0:
         avg = sum(hist) / len(hist)
         min_h = min(hist)
         if min_h > avg * (0.8):  # measuring how flat we want the histogram to get before we change f
@@ -226,10 +237,12 @@ plt.show()
 
 # defining parameter (temperature range)
 T = np.linspace(2,3,50)
+T_relax=[]
 gaps = []
 relax = []
 for k in range(len(T)):
     t = T[k]
+    #s_new=random_lattice(num_sites)
     M,E_glauber= glauber(E, s_2d, t)
     # pairs of successive magnetisations
     X1 = M[:-1]
@@ -245,11 +258,14 @@ for k in range(len(T)):
     # Y= np.column_stack([t[1:],M[1:]])
     if spec_gap!=0:
         relax.append(1/spec_gap) #relaxation time
+        T_relax.append(t)
 
 #plotting spectral gap
+gaps_smooth=savgol_filter(gaps, 11, 3)
 plt.figure()
-plt.plot(T, gaps)
-plt.axvline(x=2 / np.log(1 + np.sqrt(2)),label='Tc (Onsager)')
+plt.plot(T, gaps, label='raw')
+plt.plot(T , gaps_smooth, 'r--', label='smoothed')
+plt.axvline(x=2 / np.log(1 + np.sqrt(2)),linestyle='--',label='Tc (Onsager)')
 plt.xlabel('Temperature')
 plt.ylabel('Spectral Gap ')
 plt.grid(True)
@@ -259,8 +275,8 @@ plt.show()
 
 #plotting relaxation time
 plt.figure()
-plt.plot(T, relax)
-plt.axvline(x=2 / np.log(1 + np.sqrt(2)), label=r'Tc (Onsager)')
+plt.plot(T_relax, relax)
+plt.axvline(x=2 / np.log(1 + np.sqrt(2)), linestyle='--', label=r'Tc (Onsager)')
 plt.xlabel('Temperature')
 plt.ylabel('Relaxation Time ')
 plt.grid(True)
