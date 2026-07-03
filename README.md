@@ -1,72 +1,81 @@
-# Monte Carlo Methods for Statistical Physics and Dynamical Systems
+# Koopman Operator Analysis of Relaxation Dynamics in the 2D Ising Model
 
-This repository contains implementations of Monte Carlo methods applied to the Ising model, with a focus on both **equilibrium thermodynamics** and **dynamical behaviour of stochastic systems**.
+This repository contains the code and results from an undergraduate research project investigating **relaxation dynamics in the two-dimensional Ising model** using **Koopman operator theory**.
 
----
-
-## 🔹 Project Overview
-
-I study the 2D Ising model using a combination of:
-
-- **Wang–Landau sampling** → to estimate the density of states \( g(E) \)  
-- **Glauber dynamics** → to generate stochastic trajectories  
-- **Koopman operator approximation (EDMD)** → to analyse system dynamics  
-
-This allows me to connect:
-- equilibrium properties (e.g. specific heat)  
-- with dynamical properties (e.g. relaxation time, spectral gap)  
+The central objective of this project is to examine whether the spectral properties of a finite-dimensional approximation to the Koopman operator capture signatures of **critical slowing down** near the ferromagnetic phase transition.
 
 ---
 
-## 🔹 Key Results
+## Background
 
-- Estimated density of states \( g(E) \) using Wang–Landau sampling  
-- Recovered thermodynamic quantities such as:
-  - partition function \( Z(T) \)  
-  - internal energy  
-  - specific heat \( C_v(T) \)  
+The two-dimensional Ising model exhibits a second-order phase transition at the critical temperature
 
-- Approximated the **Koopman operator** from simulation data using EDMD  
-- Observed a **reduction in spectral gap near the critical temperature**, indicating **critical slowing down**  
-- Analysed how dynamical behaviour changes with temperature (parametric dependence)  
+\[
+T_c = \frac{2}{\ln(1+\sqrt{2})} \approx 2.269.
+\]
 
----
+Near this temperature, the relaxation time of the system diverges, leading to the phenomenon of **critical slowing down**.
 
-## 🔹 Methods
-
-### Wang–Landau Algorithm
-- Estimates the density of states \( g(E) \)  
-- Uses adaptive updates to achieve a flat histogram
-- Non-Markovian
-
-### Glauber Dynamics
-- Generates a Markov chain at fixed temperature  
-- Used to generate 'snapshots' of data for EDMD of Koopman Operator at each temperature
-
-### Koopman Operator (EDMD)
-- Data-driven approximation of the evolution operator  
-- Extracts spectral information from trajectories  
-- Used to estimate relaxation times via spectral gap  
+Instead of analysing relaxation solely through conventional autocorrelation functions, this project adopts an **operator-theoretic viewpoint**, approximating the Koopman operator using **Extended Dynamic Mode Decomposition (EDMD)**.
 
 ---
 
-## 🔹 Code Structure
+## Methodology
 
-- `ising_wl_1d.py`  
-  → Wang–Landau simulation (1D)
+### Simulation
 
-- `ising_wl_2d.py`  
-  → Wang–Landau simulation (2D)
+Snapshots were generated from the dynamics of a
 
-- `ising_koop.py`  
-  → Glauber dynamics + Koopman operator (EDMD)
+- 16 × 16 square Ising lattice
+- Periodic boundary conditions
+- Glauber dynamics
+- Monte Carlo evolution
+
+For each temperature, trajectories were collected after equilibration.
 
 ---
 
-## 🔹 Outputs
+### Observables
 
-- Log density of states \( \log g(E) \)  
-- Specific heat curves showing phase transition  
-- Koopman spectral gap vs temperature  
+The EDMD basis consists of two physically meaningful observables:
 
-  
+- **Nearest-neighbour spin correlation**
+- **Next-nearest-neighbour spin correlation**
+
+These observables form the feature space from which the finite-dimensional Koopman operator is approximated.
+
+---
+
+### Koopman Approximation
+
+Using the collected trajectory data,
+
+- EDMD constructs a finite-dimensional approximation of the Koopman operator,
+- the eigenvalue spectrum is computed,
+- and the **spectral gap**
+
+\[
+\Delta = |\lambda_1| - |\lambda_2|
+\]
+
+is evaluated as a function of temperature.
+
+The spectral gap serves as an indicator of the rate at which observables relax toward equilibrium.
+
+---
+
+## Results
+
+The primary result of this work is the temperature dependence of the Koopman spectral gap.
+
+As the system approaches the Onsager critical temperature,
+
+- the spectral gap decreases significantly,
+- indicating increasingly slow relaxation,
+- consistent with the phenomenon of **critical slowing down**.
+
+The repository includes the generated spectral-gap plot.
+
+---
+
+## Repository Structure
